@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Wersja jednokolorowa ikony dla ikon motywowych (Android 13+) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- obrys kartki -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:pathData="M37,37.5h34a2.5,2.5 0,0 1,2.5 2.5v30a2.5,2.5 0,0 1,-2.5 2.5h-34a2.5,2.5 0,0 1,-2.5 -2.5v-30a2.5,2.5 0,0 1,2.5 -2.5z" />
+
+    <!-- nagłówek -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M37,36h34a4,4 0,0 1,4 4v6h-42v-6a4,4 0,0 1,4 -4z" />
+
+    <!-- kółka spirali -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M42,32h4v9a2,2 0,0 1,-4 0z M62,32h4v9a2,2 0,0 1,-4 0z" />
+
+    <!-- litera I -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M43,53h5v14h-5z" />
+
+    <!-- litera G -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M63.6,55.4A7,7 0,1 0,65.8 60L60,60" />
+</vector>
