@@ -26,6 +26,12 @@ Z wiersza poleceń:
 
 Plik APK pojawi się w `app/build/outputs/apk/debug/`.
 
+## CI
+
+Każdy PR i push do `main` uruchamia workflow **Android build** (GitHub Actions),
+który buduje wersję debug. Gotowy plik APK można pobrać z zakładki **Actions**
+→ wybrane uruchomienie → sekcja **Artifacts** (przechowywany 14 dni).
+
 ## Struktura
 
 ```
