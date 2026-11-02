@@ -6,6 +6,11 @@ Ekran startowy pokazuje obrazek z grafikiem. Można go przybliżać dwoma palcam
 lub dwukrotnym stuknięciem. Przycisk **Zmień grafik** pozwala wybrać nowy obrazek
 z pamięci telefonu; jest on kopiowany do pamięci aplikacji i zostaje po jej ponownym uruchomieniu.
 
+Po wczytaniu grafiku aplikacja rozpoznaje na nim tekst (Google ML Kit, bez internetu),
+odszukuje nazwę dzisiejszego dnia tygodnia (np. „Poniedziałek”) i automatycznie przybliża
+widok na jego kafelek, czyli wiersz tabeli między poziomymi liniami. Przycisk z kalendarzem
+wraca do dzisiejszego dnia po ręcznym przesuwaniu.
+
 ## Wymagania
 
 - Android Studio (Ladybug lub nowsze)
@@ -29,7 +34,7 @@ Plik APK pojawi się w `app/build/outputs/apk/debug/`.
 ## CI
 
 Każdy PR i push do `main` uruchamia workflow **Android build** (GitHub Actions),
-który buduje wersję debug. Gotowy plik APK można pobrać z zakładki **Actions**
+który uruchamia testy jednostkowe i buduje wersję debug. Gotowy plik APK można pobrać z zakładki **Actions**
 → wybrane uruchomienie → sekcja **Artifacts** (przechowywany 14 dni).
 
 ## Struktura
@@ -38,7 +43,9 @@ który buduje wersję debug. Gotowy plik APK można pobrać z zakładki **Action
 app/src/main/java/pl/bartezzo/ilagrafik/
 ├── MainActivity.kt             # ekran startowy z grafikiem
 ├── data/GrafikRepository.kt    # zapis i odczyt obrazka z grafikiem
+├── data/DayTileLocator.kt      # wyszukiwanie kafelka dnia (nazwy dni, linie tabeli)
+├── data/TodayTileFinder.kt     # rozpoznawanie tekstu ML Kit + DayTileLocator
 └── ui/
-    ├── ZoomableImage.kt        # obrazek z przybliżaniem
+    ├── ZoomableImage.kt        # obrazek z przybliżaniem i przybliżaniem na kafelek
     └── theme/Theme.kt          # motyw Material 3
 ```

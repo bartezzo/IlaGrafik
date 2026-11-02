@@ -50,6 +50,8 @@ class GrafikRepository(private val context: Context) {
             // ImageDecoder sam uwzględnia obrót zdjęcia zapisany w EXIF.
             val source = ImageDecoder.createSource(file)
             ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
+                // Bitmapa programowa: potrzebny jest odczyt pikseli przy szukaniu dzisiejszego dnia.
+                decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
                 val size = info.size
                 val scale = maxOf(size.width, size.height).toFloat() / MAX_DIMENSION
                 if (scale > 1f) {
