@@ -2,6 +2,10 @@
 
 Aplikacja na Androida napisana w Kotlinie z użyciem Jetpack Compose i Material 3.
 
+Ekran startowy pokazuje obrazek z grafikiem. Można go przybliżać dwoma palcami
+lub dwukrotnym stuknięciem. Przycisk **Zmień grafik** pozwala wybrać nowy obrazek
+z pamięci telefonu; jest on kopiowany do pamięci aplikacji i zostaje po jej ponownym uruchomieniu.
+
 ## Wymagania
 
 - Android Studio (Ladybug lub nowsze)
@@ -26,6 +30,9 @@ Plik APK pojawi się w `app/build/outputs/apk/debug/`.
 
 ```
 app/src/main/java/pl/bartezzo/ilagrafik/
-├── MainActivity.kt      # ekran startowy
-└── ui/theme/Theme.kt    # motyw Material 3
+├── MainActivity.kt             # ekran startowy z grafikiem
+├── data/GrafikRepository.kt    # zapis i odczyt obrazka z grafikiem
+└── ui/
+    ├── ZoomableImage.kt        # obrazek z przybliżaniem
+    └── theme/Theme.kt          # motyw Material 3
 ```
