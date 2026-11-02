@@ -6,5 +6,6 @@
     <string name="no_grafik">Brak grafiku</string>
     <string name="no_grafik_hint">Wybierz obrazek z grafikiem z pamięci telefonu. Będzie widoczny na ekranie startowym.</string>
     <string name="grafik_updated">Grafik zaktualizowany</string>
+    <string name="show_today">Pokaż dzisiejszy dzień</string>
     <string name="grafik_error">Nie udało się wczytać obrazka. Wybierz plik JPG lub PNG.</string>
 </resources>

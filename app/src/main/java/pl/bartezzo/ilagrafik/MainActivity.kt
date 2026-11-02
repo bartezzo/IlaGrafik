@@ -1,5 +1,6 @@
 package pl.bartezzo.ilagrafik
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,6 +25,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -35,14 +38,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import java.time.LocalDate
 import kotlinx.coroutines.launch
 import pl.bartezzo.ilagrafik.data.GrafikRepository
+import pl.bartezzo.ilagrafik.data.Tile
+import pl.bartezzo.ilagrafik.data.TodayTileFinder
+import pl.bartezzo.ilagrafik.ui.ZoomState
 import pl.bartezzo.ilagrafik.ui.ZoomableImage
 import pl.bartezzo.ilagrafik.ui.theme.IlaGrafikTheme
 
@@ -51,9 +58,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val repository = GrafikRepository(applicationContext)
+        val tileFinder = TodayTileFinder()
         setContent {
             IlaGrafikTheme {
-                HomeScreen(repository)
+                HomeScreen(repository, tileFinder)
             }
         }
     }
@@ -61,19 +69,34 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(repository: GrafikRepository) {
+fun HomeScreen(repository: GrafikRepository, tileFinder: TodayTileFinder) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var image by remember { mutableStateOf<ImageBitmap?>(null) }
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var loading by remember { mutableStateOf(true) }
     // Zwiększany po każdej podmianie, żeby ponownie wczytać obrazek.
     var version by remember { mutableIntStateOf(0) }
+    // Kafelek dzisiejszego dnia znaleziony na obrazku (null = nie znaleziono).
+    var todayTile by remember { mutableStateOf<Tile?>(null) }
 
     LaunchedEffect(version) {
         loading = true
-        image = repository.load()?.asImageBitmap()
+        todayTile = null
+        bitmap = repository.load()
         loading = false
+    }
+
+    val current = bitmap
+    val image = remember(current) { current?.asImageBitmap() }
+    val zoomState = remember(current) { ZoomState() }
+
+    // Po wczytaniu obrazka szukamy dzisiejszego dnia i przybliżamy na niego.
+    LaunchedEffect(current) {
+        if (current == null) return@LaunchedEffect
+        val tile = runCatching { tileFinder.find(current, LocalDate.now().dayOfWeek) }.getOrNull()
+        todayTile = tile
+        if (tile != null) zoomState.zoomTo(tile)
     }
 
     val pickImage = rememberLauncherForActivityResult(
@@ -100,25 +123,41 @@ fun HomeScreen(repository: GrafikRepository) {
         topBar = { TopAppBar(title = { Text(stringResource(R.string.app_name)) }) },
         floatingActionButton = {
             if (image != null) {
-                ExtendedFloatingActionButton(
-                    onClick = openPicker,
-                    icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
-                    text = { Text(stringResource(R.string.change_grafik)) }
-                )
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    todayTile?.let { tile ->
+                        SmallFloatingActionButton(
+                            onClick = { scope.launch { zoomState.zoomTo(tile) } }
+                        ) {
+                            Icon(
+                                Icons.Filled.DateRange,
+                                contentDescription = stringResource(R.string.show_today)
+                            )
+                        }
+                    }
+                    ExtendedFloatingActionButton(
+                        onClick = openPicker,
+                        icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
+                        text = { Text(stringResource(R.string.change_grafik)) }
+                    )
+                }
             }
         }
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .clipToBounds(),
             contentAlignment = Alignment.Center
         ) {
-            val current = image
             when {
                 loading -> CircularProgressIndicator()
-                current != null -> ZoomableImage(
-                    bitmap = current,
+                image != null -> ZoomableImage(
+                    bitmap = image,
+                    state = zoomState,
                     contentDescription = stringResource(R.string.grafik_description)
                 )
                 else -> EmptyState(onAddClick = openPicker)
